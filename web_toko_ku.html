@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>wow spagetis — Belanja Online</title>
+<style>
+:root{--primary:#087f5b;--dark:#173b32;--muted:#66756f;--bg:#f5f8f6;--card:#fff;--line:#e4ece7}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:#1f2d28}
+header{background:var(--dark);color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-size:24px;font-weight:800;letter-spacing:.2px}.logo span{color:#8ce0b7}
+header p{margin:5px 0 0;color:#d4e6dd;font-size:13px}
+.cart-button{border:0;border-radius:12px;background:#fff;color:var(--dark);padding:11px 15px;font-weight:700;cursor:pointer}
+.hero{padding:42px 5%;background:linear-gradient(120deg,#dff5e9,#f5fbf7);display:flex;align-items:center;justify-content:space-between;gap:24px}
+.hero h1{font-size:clamp(28px,4vw,44px);margin:0 0 12px;color:var(--dark);max-width:620px}.hero p{color:#4e665b;line-height:1.6;max-width:560px}.hero .tag{display:inline-block;background:#fff;padding:7px 12px;border-radius:999px;color:var(--primary);font-weight:bold;font-size:12px}
+.hero-icon{font-size:86px;flex-shrink:0}
+main{max-width:1200px;margin:auto;padding:30px 5% 55px}
+.section-title{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:18px}.section-title h2{margin:0;color:var(--dark)}.section-title p{margin:5px 0 0;color:var(--muted);font-size:14px}
+.search{width:min(100%,280px);padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:14px}
+.products{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.product{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 4px 16px #173b3208;display:flex;flex-direction:column}
+.product-art{height:150px;display:grid;place-items:center;font-size:64px;background:linear-gradient(145deg,#e5f6ed,#f7fbf8)}
+.product-content{padding:15px;display:flex;flex-direction:column;gap:9px;flex:1}.product h3{margin:0;font-size:17px}.description{font-size:13px;color:var(--muted);line-height:1.45;min-height:36px}
+.price{font-weight:800;color:var(--primary);font-size:18px}
+.add{border:0;border-radius:10px;background:var(--primary);color:#fff;padding:11px;font-weight:700;cursor:pointer;margin-top:auto}.add:hover{background:#066749}
+.note{margin-top:24px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:17px;color:var(--muted);font-size:13px;line-height:1.6}
+footer{background:#173b32;color:#d4e6dd;padding:24px 5%;text-align:center;font-size:13px}
+.modal-backdrop{position:fixed;inset:0;background:#10251dcc;display:none;align-items:center;justify-content:center;padding:16px;z-index:10}.modal-backdrop.show{display:flex}
+.modal{background:white;width:min(100%,600px);max-height:92vh;overflow:auto;border-radius:18px;padding:22px;box-shadow:0 20px 60px #0003}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.modal h2{margin:0;color:var(--dark)}.close{border:0;background:#eef5f0;border-radius:9px;padding:8px 12px;cursor:pointer;font-size:18px}
+.cart-empty{color:var(--muted);padding:20px 0}.cart-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}.cart-row small{display:block;color:var(--muted);margin-top:4px}
+.qty{display:flex;align-items:center;gap:8px}.qty button{border:1px solid var(--line);background:#f6faf7;border-radius:7px;width:28px;height:28px;cursor:pointer}
+.remove{border:0;background:transparent;color:#b42318;cursor:pointer}
+.total{display:flex;justify-content:space-between;font-size:18px;font-weight:800;padding:18px 0}
+form{display:grid;gap:12px}label{font-size:13px;font-weight:700;color:#42564c}input,textarea,select{width:100%;padding:12px;border:1px solid #d6e2da;border-radius:10px;font:inherit;margin-top:6px}textarea{min-height:76px;resize:vertical}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.checkout{width:100%;padding:14px;background:#20a464;color:white;border:0;border-radius:11px;font-size:16px;font-weight:800;cursor:pointer}.checkout:disabled{opacity:.5;cursor:not-allowed}.wa-help{font-size:12px;color:var(--muted);line-height:1.5}
+@media(max-width:900px){.products{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-icon{font-size:64px}}
+@media(max-width:520px){.products{grid-template-columns:1fr 1fr;gap:10px}.product-art{height:115px;font-size:48px}.product-content{padding:11px}.product h3{font-size:15px}.description{font-size:12px}.price{font-size:16px}.hero{padding-top:30px;padding-bottom:30px}.hero-icon{display:none}.form-grid{grid-template-columns:1fr}.cart-row{grid-template-columns:1fr auto}.cart-row .remove{grid-column:2}.logo{font-size:21px}}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="logo">wow<span>sepageti.</span></div><p>Makanan favorit, pesan dengan mudah</p></div>
+  <button class="cart-button" onclick="openCart()">🛒 Keranjang (<span id="cartCount">0</span>)</button>
+</header>
+<section class="hero">
+  <div><span class="tag">TOKO ONLINE</span><h1>Makanan enak, tinggal pesan.</h1><p>Pilih menu favorit, atur jumlahnya di keranjang, lalu checkout. Detail pesanan akan disiapkan otomatis untuk dikirim ke WhatsApp.</p></div>
+  <div class="hero-icon" aria-hidden="true">🛍️</div>
+</section>
+<main>
+  <div class="section-title"><div><h2>Menu pilihan</h2><p>Pilih menu yang kamu suka untuk mulai memesan.</p></div><input class="search" id="search" placeholder="Cari produk..." oninput="renderProducts()"></div>
+  <div class="products" id="products"></div>
+  <div class="note"><strong>Untuk pemilik wow spageti:</strong> menu dan harga di atas adalah contoh dan bisa diganti sesuai menu yang dijual melalui bagian <em>PENGATURAN TOKO</em> di kode HTML.</div>
+</main>
+<footer>© <span id="year"></span> wow sepageti. Terima kasih sudah memesan di wow sepageti!</footer>
+
+<div class="modal-backdrop" id="cartModal" onclick="backdropClose(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
+    <div class="modal-head"><h2 id="cartTitle">Keranjang & Checkout</h2><button class="close" onclick="closeCart()" aria-label="Tutup">✕</button></div>
+    <div id="cartItems"></div>
+    <div class="total"><span>Total belanja</span><span id="totalPrice">Rp0</span></div>
+    <form id="checkoutForm">
+      <div class="form-grid">
+        <label>Nama pembeli<input id="buyerName" required placeholder="Nama lengkap"></label>
+        <label>Nomor HP pembeli<input id="buyerPhone" required type="tel" placeholder="08xxxxxxxxxx"></label>
+      </div>
+      <label>prodi dan angkatan<textarea id="buyerAddress" required placeholder="PRODI, ANGKATAN, "></textarea></label>
+      <label>Metode pembayaran
+        <select id="payment"><option>COD (bayar saat menu diterima)</option><option>Transfer bank (konfirmasi ke penjual)</option><option>E-wallet (konfirmasi ke penjual)</option></select>
+      </label>
+      <label>Catatan pesanan (opsional)<textarea id="buyerNote" placeholder="Warna, ukuran, patokan alamat, dan lainnya"></textarea></label>
+      <button class="checkout" id="checkoutButton" type="submit">Checkout via WhatsApp</button>
+      <div class="wa-help">Setelah tombol ditekan, WhatsApp akan terbuka dengan detail pesanan. Tekan tombol <strong>Kirim</strong> di WhatsApp untuk mengirim pesanan kepada penjual.</div>
+    </form>
+  </div>
+</div>
+<script>
+// ================= PENGATURAN TOKO =================
+// Ganti nomor di bawah dengan nomor WhatsApp penjual.
+// Format: kode negara + nomor, tanpa tanda +, spasi, atau strip.
+// Contoh nomor Indonesia: 6281234567890
+const WHATSAPP_PENJUAL = "6287836634150";
+const NAMA_TOKO = "TokoKu";
+
+// Ganti contoh produk di bawah sesuai menu yang dijual.
+// harga ditulis sebagai angka, tanpa titik atau simbol Rp.
+const products = [
+  {id:1,name:"Nasi Goreng Spesial",price:18000,emoji:"🍛",desc:"Nasi goreng gurih dengan telur dan pelengkap."},
+  {id:2,name:"Mie Goreng",price:15000,emoji:"🍜",desc:"Mie goreng lezat dengan sayuran dan topping."},
+  {id:3,name:"Ayam Geprek",price:20000,emoji:"🍗",desc:"Ayam crispy dengan sambal pilihan."},
+  {id:4,name:"Burger",price:17000,emoji:"🍔",desc:"Burger praktis dengan sayuran dan saus."},
+  {id:5,name:"Kentang Goreng",price:12000,emoji:"🍟",desc:"Kentang goreng renyah untuk camilan."},
+  {id:6,name:"Roti Cokelat",price:8000,emoji:"🥐",desc:"Roti lembut dengan isian cokelat."},
+  {id:7,name:"Es Teh",price:5000,emoji:"🧋",desc:"Minuman teh dingin yang menyegarkan."},
+  {id:8,name:"Jus Mangga",price:10000,emoji:"🥭",desc:"Jus mangga segar untuk menemani makan."}
+];
+// ==================================================
+
+let cart = {};
+const rupiah = n => new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(n);
+function renderProducts(){
+  const q=document.getElementById("search").value.toLowerCase();
+  const list=products.filter(p=>(p.name+" "+p.desc).toLowerCase().includes(q));
+  document.getElementById("products").innerHTML=list.map(p=>`
+    <article class="product">
+      <div class="product-art">${p.emoji}</div>
+      <div class="product-content"><h3>${escapeHtml(p.name)}</h3><div class="description">${escapeHtml(p.desc)}</div><div class="price">${rupiah(p.price)}</div>
+      <button class="add" onclick="addToCart(${p.id})">+ Tambah ke keranjang</button></div>
+    </article>`).join("") || '<p>Produk tidak ditemukan.</p>';
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function addToCart(id){cart[id]=(cart[id]||0)+1;updateCartCount();renderCart();const b=document.querySelector(".cart-button");b.textContent=`🛒 Keranjang (${countCart()})`;setTimeout(()=>b.innerHTML=`🛒 Keranjang (<span id="cartCount">${countCart()}</span>)`,800);}
+function countCart(){return Object.values(cart).reduce((a,b)=>a+b,0)}
+function cartTotal(){return products.reduce((sum,p)=>sum+p.price*(cart[p.id]||0),0)}
+function updateCartCount(){document.getElementById("cartCount").textContent=countCart()}
+function renderCart(){
+ const chosen=products.filter(p=>cart[p.id]);
+ const area=document.getElementById("cartItems");
+ if(!chosen.length){area.innerHTML='<div class="cart-empty">Keranjang masih kosong. Tambahkan produk terlebih dahulu.</div>';}
+ else area.innerHTML=chosen.map(p=>`<div class="cart-row"><div><strong>${escapeHtml(p.name)}</strong><small>${rupiah(p.price)} / item</small></div><div class="qty"><button type="button" onclick="changeQty(${p.id},-1)">−</button><span>${cart[p.id]}</span><button type="button" onclick="changeQty(${p.id},1)">+</button></div><button class="remove" type="button" onclick="removeItem(${p.id})">Hapus</button></div>`).join("");
+ document.getElementById("totalPrice").textContent=rupiah(cartTotal());
+ document.getElementById("checkoutButton").disabled=!chosen.length;
+}
+function changeQty(id,delta){cart[id]=(cart[id]||0)+delta;if(cart[id]<=0)delete cart[id];updateCartCount();renderCart()}
+function removeItem(id){delete cart[id];updateCartCount();renderCart()}
+function openCart(){renderCart();document.getElementById("cartModal").classList.add("show")}
+function closeCart(){document.getElementById("cartModal").classList.remove("show")}
+function backdropClose(e){if(e.target.id==="cartModal")closeCart()}
+document.getElementById("checkoutForm").addEventListener("submit",function(e){
+ e.preventDefault();
+ if(!countCart()){alert("Keranjang masih kosong.");return;}
+ if(!/^\d{10,15}$/.test(WHATSAPP_PENJUAL)){alert("Nomor WhatsApp penjual belum benar. Buka file HTML dan ganti WHATSAPP_PENJUAL di bagian PENGATURAN TOKO.");return;}
+ const name=document.getElementById("buyerName").value.trim();
+ const phone=document.getElementById("buyerPhone").value.trim();
+ const address=document.getElementById("buyerAddress").value.trim();
+ const payment=document.getElementById("payment").value;
+ const note=document.getElementById("buyerNote").value.trim();
+ const lines=products.filter(p=>cart[p.id]).map((p,i)=>`${i+1}. ${p.name} x${cart[p.id]} — ${rupiah(p.price*cart[p.id])}`);
+ const message=`Halo ${NAMA_TOKO}, saya ingin memesan:%0A%0A`+
+ `*DETAIL PESANAN*%0A${encodeURIComponent(lines.join("\n"))}%0A%0A`+
+ `*Total: ${encodeURIComponent(rupiah(cartTotal()))}*%0A%0A`+
+ `*DATA PEMBELI*%0ANama: ${encodeURIComponent(name)}%0ANomor HP: ${encodeURIComponent(phone)}%0AAlamat: ${encodeURIComponent(address)}%0APembayaran: ${encodeURIComponent(payment)}%0ACatatan: ${encodeURIComponent(note||"-")}%0A%0AMohon konfirmasi ketersediaan menu dan ongkir. Terima kasih.`;
+ const url=`https://wa.me/${WHATSAPP_PENJUAL}?text=${message}`;
+ window.open(url,"_blank");
+});
+document.getElementById("year").textContent=new Date().getFullYear();
+renderProducts();updateCartCount();renderCart();
+</script>
+</body>
+</html>
